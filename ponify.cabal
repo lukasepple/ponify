@@ -5,8 +5,7 @@ name:                ponify
 version:             0.1.0.0
 synopsis:            ponify everything - now in Haskell
 -- description:         
--- license:             
-license-file:        LICENSE
+license:             PublicDomain
 author:              Lukas Epple
 maintainer:          git@lukasepple.de
 -- copyright:           
