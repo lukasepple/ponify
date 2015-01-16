@@ -16,8 +16,13 @@ deponify input rules = ponify input (map swap rules)
 parseRules :: String -> [(T.Text, T.Text)]
 parseRules = map (composeRule . words) . dropComments . lines
   where dropComments = filter (\x -> not (null x) && head x /= '#')
-        composeRule list = mapTuple (T.pack . unwords) (take dotsIndex list, drop (dotsIndex + 1) list)
+        composeRule list = mapTuple (expandPattern . T.pack . unwords) (take dotsIndex list, drop (dotsIndex + 1) list)
           where mapTuple f t = (f (fst t), f (snd t))
+                expandPattern p = let hasLeadingAsteriks = T.head p == '*'
+                                      hasFinalAsteriks   = T.last p == '*'
+                                      calcExpanded :: Bool -> T.Text
+                                      calcExpanded bool = if bool then T.empty else T.pack " " in
+                                  calcExpanded hasLeadingAsteriks `T.append` p ` T.append` calcExpanded hasFinalAsteriks
                 dotsIndex = fromJust (elemIndex "::" list)
 
 data MainOptions = MainOptions
