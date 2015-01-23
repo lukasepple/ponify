@@ -28,7 +28,7 @@ parseRules = map (composeRule . words) . dropComments . lines
 globalReplace :: T.Text -> T.Text -> T.Text -> T.Text
 globalReplace needle repl haystack = if needle `T.isInfixOf` haystack
                                      then
-                                      T.unlines (map (T.unwords . replaceLine . T.words) (T.lines haystack))
+                                      T.unlines $ map (T.unwords . replaceLine . T.words) (T.lines haystack)
                                      else
                                       haystack
   where replaceLine line = map (\word -> replaceWord word) line
@@ -63,4 +63,4 @@ main = runCommand $ \opts args -> do
   rules <- readFile (optRules opts)
   -- process the input
   let action = if (optDeponify opts) then deponify else ponify in
-    putStr (T.unpack (action (T.pack contents) (parseRules rules)))
+    putStr $ T.unpack $ action (T.pack contents) (parseRules rules)
