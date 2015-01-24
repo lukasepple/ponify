@@ -55,7 +55,7 @@ instance Options MainOptions where
       "Wether to ponify"
     <*> simpleOption "deponify" False
       "Wether to deponify"
-    <*> simpleOption "rules" "rules.txt"
+    <*> simpleOption "rules" "rules"
       "Which rules file to use"
 
 main :: IO ()
