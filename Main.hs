@@ -26,18 +26,21 @@ parseRules = map (composeRule . words) . dropComments . lines
                 dotsIndex = fromJust (elemIndex "::" list)
 
 globalReplace :: T.Text -> T.Text -> T.Text -> T.Text
-globalReplace needle repl haystack = if needle `T.isInfixOf` haystack
-                                     then
-                                      T.unlines $ map (T.unwords . replaceLine . T.words) (T.lines haystack)
-                                     else
-                                      haystack
-  where replaceLine line = map (\word -> replaceWord word) line
-        replaceWord word
-          | word == needle = repl
-          | needle `T.isInfixOf` word &&
-            onlyPunctuation (foldl1 T.append (T.splitOn needle word)) = T.replace needle repl word
-          | otherwise      = word
-          where onlyPunctuation str = T.foldl (\acc c -> c `elem` ".?!,\"\' " && acc) True str
+globalReplace needle repl haystack = T.unlines $ map T.unwords $ map (replaceLine needle repl) $ map T.words (T.lines haystack)
+
+replaceLine :: T.Text -> T.Text -> [T.Text] -> [T.Text]
+replaceLine needle repl line = map (replaceWord needle repl) line
+
+replaceWord :: T.Text -> T.Text -> T.Text -> T.Text
+replaceWord needle repl word
+  | word == needle = repl
+  | T.last needle == '*' && T.last repl == '*' &&
+    ((T.init needle) `T.isPrefixOf` word ||
+       onlyPunctuation (head $ T.splitOn needle word)) = T.replace (T.init needle) (T.init repl) word
+  | needle `T.isInfixOf` word &&
+    onlyPunctuation (foldl1 T.append $ T.splitOn needle word) = T.replace needle repl word
+  | otherwise      = word
+  where onlyPunctuation str = T.foldl (\acc c -> c `elem` ".?!,\"\' " && acc) True str
 
 data MainOptions = MainOptions
   {
