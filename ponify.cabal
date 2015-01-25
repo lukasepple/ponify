@@ -3,24 +3,22 @@
 
 name:                ponify
 version:             0.1.0.0
-synopsis:            ponify everything - now in Haskell
+synopsis:            ponify and deponify text
 -- description:         
-license:             PublicDomain
-author:              Lukas Epple
+license:             OtherLicense
+license-file:        LICENSE
+author:              sternenseemann
 maintainer:          git@lukasepple.de
 -- copyright:           
-category:            text
+category:            Text
 build-type:          Simple
--- extra-source-files:  
+extra-source-files:  README.md
 cabal-version:       >=1.10
 
 executable ponify
   main-is:             Main.hs
   -- other-modules:       
   -- other-extensions:    
-  build-depends:
-    base >=4.7 && <4.8,
-    text,
-    options
+  build-depends:       base >=4.7 && <4.8, text >=1.2 && <1.3, options >=1.2 && <1.3
   -- hs-source-dirs:      
   default-language:    Haskell2010
