@@ -8,7 +8,7 @@ import Options
 ponify :: T.Text -> [(T.Text, T.Text)] -> T.Text
 ponify input rules
   | null rules = input
-  | otherwise  = ponify (uncurry globalReplace (head rules) input) (tail rules)
+  | otherwise  = ponify (uncurry replaceAll (head rules) input) (tail rules)
 
 deponify :: T.Text -> [(T.Text, T.Text)] -> T.Text
 deponify input rules = ponify input (map swap rules)
@@ -25,22 +25,36 @@ parseRules = map (composeRule . words) . dropComments . lines
           where mapTuple f t = (f (fst t), f (snd t))
                 dotsIndex = fromJust (elemIndex "::" list)
 
-globalReplace :: T.Text -> T.Text -> T.Text -> T.Text
-globalReplace needle repl haystack = T.unlines $ map T.unwords $ map (replaceLine needle repl) $ map T.words (T.lines haystack)
+replaceAll  :: T.Text -> T.Text -> T.Text -> T.Text
+replaceAll needle replace haystack = replaceMatches needle replace haystack matches
+  where replaceMatches needle replace haystack matches
+          | null matches = haystack
+          | otherwise    = let replaceExpanded = if T.last replace == '*' then T.init replace else replace in
+              replaceMatches needle replaceExpanded (T.take (fst (head matches)) haystack `T.append` replaceExpanded `T.append` (T.drop (snd (head matches)) haystack))
+                (tail matches)
+        matches = findMatches needle haystack
 
-replaceLine :: T.Text -> T.Text -> [T.Text] -> [T.Text]
-replaceLine needle repl line = map (replaceWord needle repl) line
+findMatches :: (Integral a, Num a) => T.Text -> T.Text -> [(a, a)]
+findMatches pattern haystack = getIndices pattern haystack 0
+  where getIndices :: (Integral a) => T.Text -> T.Text -> a -> [(a, a)]
+        getIndices pattern haystack currentIndex
+          | T.null haystack = []
+          | match           = (currentIndex, matchLength) : getIndices pattern (T.tail haystack) (currentIndex + 1)
+          | otherwise       = getIndices pattern (T.tail haystack) (currentIndex + 1)
+            where match     = if T.last pattern == '*'
+                              then
+                                T.take ((T.length pattern) - 1) haystack == T.take ((T.length pattern) - 1) pattern
+                              else 
+                                let afterMatch = T.drop (T.length pattern) haystack in
+                                  T.take (T.length pattern) haystack == pattern && (T.null afterMatch || (textElem (T.head afterMatch) (T.pack " \t\n\r")))
+                  matchLength = if T.last pattern == '*'
+                                then (fromIntegral (T.length pattern) - 1)
+                                else (fromIntegral (T.length pattern))
 
-replaceWord :: T.Text -> T.Text -> T.Text -> T.Text
-replaceWord needle repl word
-  | word == needle = repl
-  | T.last needle == '*' && T.last repl == '*' &&
-    ((T.init needle) `T.isPrefixOf` word ||
-       onlyPunctuation (head $ T.splitOn needle word)) = T.replace (T.init needle) (T.init repl) word
-  | needle `T.isInfixOf` word &&
-    onlyPunctuation (foldl1 T.append $ T.splitOn needle word) = T.replace needle repl word
-  | otherwise      = word
-  where onlyPunctuation str = T.foldl (\acc c -> c `elem` ".?!,\"\' " && acc) True str
+textElem :: Char -> T.Text -> Bool
+textElem c str = isJust (T.findIndex (== c) str)
+
+-- onlyPunctuation str = T.foldl (\acc c -> c `elem` ".?!,\"\' " && acc) True str
 
 data MainOptions = MainOptions
   {
