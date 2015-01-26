@@ -46,15 +46,16 @@ findMatches pattern haystack = getIndices pattern haystack 0
                                 T.take ((T.length pattern) - 1) haystack == T.take ((T.length pattern) - 1) pattern
                               else 
                                 let afterMatch = T.drop (T.length pattern) haystack in
-                                  T.take (T.length pattern) haystack == pattern && (T.null afterMatch || (textElem (T.head afterMatch) (T.pack " \t\n\r")))
+                                  T.take (T.length pattern) haystack == pattern && (T.null afterMatch || (isSpace (T.head afterMatch)) || (isPunctuation (T.head afterMatch)))
                   matchLength = if T.last pattern == '*'
                                 then (fromIntegral (T.length pattern) - 1)
                                 else (fromIntegral (T.length pattern))
 
-textElem :: Char -> T.Text -> Bool
-textElem c str = isJust (T.findIndex (== c) str)
+isPunctuation :: Char -> Bool
+isPunctuation c = c `elem` ".?!,\"\' "
 
--- onlyPunctuation str = T.foldl (\acc c -> c `elem` ".?!,\"\' " && acc) True str
+isSpace :: Char -> Bool
+isSpace c = c `elem` " \n\t\r"
 
 data MainOptions = MainOptions
   {
