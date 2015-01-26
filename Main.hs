@@ -25,31 +25,28 @@ parseRules = map (composeRule . words) . dropComments . lines
           where mapTuple f t = (f (fst t), f (snd t))
                 dotsIndex = fromJust (elemIndex "::" list)
 
-replaceAll  :: T.Text -> T.Text -> T.Text -> T.Text
-replaceAll needle replace haystack = replaceMatches needle replace haystack matches
-  where replaceMatches needle replace haystack matches
-          | null matches = haystack
-          | otherwise    = let replaceExpanded = if T.last replace == '*' then T.init replace else replace in
-              replaceMatches needle replaceExpanded (T.take (fst (head matches)) haystack `T.append` replaceExpanded `T.append` (T.drop (snd (head matches)) haystack))
-                (tail matches)
-        matches = findMatches needle haystack
+replaceAll :: T.Text -> T.Text -> T.Text -> T.Text
+replaceAll needle replace haystack
+  | isNothing nextMatch = haystack
+  | otherwise           = let replaced = T.take (fst (fromJust nextMatch)) haystack `T.append`
+                                replaceExpanded `T.append`
+                                T.drop ((fst (fromJust nextMatch)) + (snd (fromJust nextMatch))) haystack in
+                                    T.head replaced `T.cons` replaceAll needle replace (T.tail replaced)
+  where nextMatch = match needle haystack 0
+        replaceExpanded = if T.last replace == '*' then T.init replace else replace
 
-findMatches :: (Integral a, Num a) => T.Text -> T.Text -> [(a, a)]
-findMatches pattern haystack = getIndices pattern haystack 0
-  where getIndices :: (Integral a) => T.Text -> T.Text -> a -> [(a, a)]
-        getIndices pattern haystack currentIndex
-          | T.null haystack = []
-          | match           = (currentIndex, matchLength) : getIndices pattern (T.tail haystack) (currentIndex + 1)
-          | otherwise       = getIndices pattern (T.tail haystack) (currentIndex + 1)
-            where match     = if T.last pattern == '*'
-                              then
-                                T.take ((T.length pattern) - 1) haystack == T.take ((T.length pattern) - 1) pattern
-                              else 
-                                let afterMatch = T.drop (T.length pattern) haystack in
-                                  T.take (T.length pattern) haystack == pattern && (T.null afterMatch || (isSpace (T.head afterMatch)) || (isPunctuation (T.head afterMatch)))
-                  matchLength = if T.last pattern == '*'
-                                then (fromIntegral (T.length pattern) - 1)
-                                else (fromIntegral (T.length pattern))
+match :: (Integral a, Num a) => T.Text -> T.Text -> a -> Maybe (a, a)
+match pattern haystack currentIndex
+  | T.null haystack  = Nothing
+  | couldMatch       = Just (currentIndex, matchLength)
+  | otherwise        = match pattern (T.tail haystack) (1 + currentIndex)
+    where couldMatch = if T.last pattern == '*'
+                        then T.take ((T.length pattern) - 1) haystack == T.take ((T.length pattern) - 1) pattern
+                        else let afterMatch = T.drop (T.length pattern) haystack in
+                               T.take (T.length pattern) haystack == pattern && (T.null afterMatch || (isSpace (T.head afterMatch)) || (isPunctuation (T.head afterMatch)))
+          matchLength = if T.last pattern == '*'
+                        then (fromIntegral (T.length pattern) - 1)
+                        else (fromIntegral (T.length pattern))
 
 isPunctuation :: Char -> Bool
 isPunctuation c = c `elem` ".?!,\"\' "
