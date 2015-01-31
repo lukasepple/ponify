@@ -11,6 +11,7 @@ It can ponify text, e. g. it converts "anybody" to "anypony" etc., and deponify 
 with `--rules` you can specify a custom [rules](./rules)-file.
 
 ## License
-This [Unlicensed](http://unlicense.org/).
+This Program is [Unlicensed](http://unlicense.org/).
 
-The idea is clearly [manandree](http://github.com/maandree)'s and I wanted to implement it in Haskell for fun. I also used the incredible awesome rules.
+## Credits
+The idea is clearly [manandree](http://github.com/maandree)'s and I wanted to implement it in Haskell for fun. I also used his incredible awesome rules.
