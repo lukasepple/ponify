@@ -1,5 +1,6 @@
 import Data.List
 import Data.Maybe
+import Data.Char
 import qualified Data.Text as T
 import Data.Tuple
 import Control.Applicative
@@ -47,12 +48,6 @@ match pattern haystack currentIndex
           matchLength = if T.last pattern == '*'
                         then (fromIntegral (T.length pattern) - 1)
                         else (fromIntegral (T.length pattern))
-
-isPunctuation :: Char -> Bool
-isPunctuation c = c `elem` ".?!,\"\' "
-
-isSpace :: Char -> Bool
-isSpace c = c `elem` " \n\t\r"
 
 data MainOptions = MainOptions
   {
