@@ -59,9 +59,9 @@ data MainOptions = MainOptions
 instance Options MainOptions where
   defineOptions = pure MainOptions
     <*> simpleOption "ponify" True
-      "Wether to ponify"
+      "Whether to ponify"
     <*> simpleOption "deponify" False
-      "Wether to deponify"
+      "Whether to deponify"
     <*> simpleOption "rules" "rules"
       "Which rules file to use"
 
