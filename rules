@@ -1,8 +1,8 @@
-# Asterisks may only be used at the end of a string, and allows to word to continue.
-# :: with surrounding spaces seperates human language (left) from pony language (right).
-# A line may start with hash to make the line a comment
-# Lower case allows any case, the last characters case select the case on any character afterward
-# Spaces (excluding no breaking spaces) is wildcard for any non-alphanumberical character.
+# Asterisks may only be used at the end of a string, and allow a word to continue.
+# :: with surrounding spaces separates human language (left) from pony language (right).
+# A line may start with a hash to make the line a comment.
+# Lower case allows any case, the last characters case select the case on any character afterward.
+# Spaces (excluding no breaking spaces) is wildcard for any non-alphanumerical character.
 
 america*   ::  amareica*
 anybody    ::  anypony
