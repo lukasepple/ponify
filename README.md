@@ -10,8 +10,5 @@ It can ponify text, e. g. it converts "anybody" to "anypony" etc., and deponify 
 
 with `--rules` you can specify a custom [rules](./rules)-file.
 
-## License
-This Program is [Unlicensed](http://unlicense.org/).
-
 ## Credits
 The idea is clearly [manandree](http://github.com/maandree)'s and I wanted to implement it in Haskell for fun. I also used his incredible awesome rules.

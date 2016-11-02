@@ -5,7 +5,7 @@ name:                ponify
 version:             0.1.0.0
 synopsis:            ponify and deponify text
 -- description:         
-license:             OtherLicense
+license:             GPL-3
 license-file:        LICENSE
 author:              sternenseemann
 maintainer:          git@lukasepple.de
